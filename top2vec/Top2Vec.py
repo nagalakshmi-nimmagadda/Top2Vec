@@ -151,6 +151,10 @@ class Top2Vec:
     workers: int (Optional)
         The amount of worker threads to be used in training the model. Larger
         amount will lead to faster training.
+        
+    ngram: range (Optional)
+        number of tokens to create in word embedding, default is None
+        example ngrame (1,2) or (2,2)
     
     tokenizer: callable (Optional, default None)
         Override the default tokenization method. If None then
@@ -182,6 +186,7 @@ class Top2Vec:
                  document_ids=None,
                  keep_documents=True,
                  workers=None,
+                 ngram=None,
                  tokenizer=None,
                  use_embedding_model_tokenizer=False,
                  umap_args=None,
@@ -320,7 +325,10 @@ class Top2Vec:
                 return doc
 
             # preprocess vocabulary
-            vectorizer = CountVectorizer(tokenizer=return_doc, preprocessor=return_doc)
+            if ngram==None:
+                ngram=(1,1)
+                
+            vectorizer = CountVectorizer(tokenizer=return_doc, preprocessor=return_doc,ngram_range=ngram)
             doc_word_counts = vectorizer.fit_transform(tokenized_corpus)
             words = vectorizer.get_feature_names()
             word_counts = np.array(np.sum(doc_word_counts, axis=0).tolist()[0])
